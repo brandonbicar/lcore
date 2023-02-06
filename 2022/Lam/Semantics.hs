@@ -25,4 +25,5 @@ subst :: Expr -> Expr -> Identifier -> Expr
 subst (Var y) t' x | y == x    = t'
                    | otherwise = Var y
 subst (App t1 t2) t' x         = App (subst t1 t' x) (subst t2 t' x)
-subst (Abs y t) t' x           = Abs y (subst t t' x)
+subst (Abs y t) t' x | x == y    = Abs y t
+                     | otherwise = Abs y (subst t t' x)
