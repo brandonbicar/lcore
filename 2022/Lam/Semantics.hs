@@ -18,7 +18,10 @@ step (App (Abs x t) t') = Just (subst t t' x)
 step (App t1 t2) =
   case step t1 of
     Just t1' -> Just (App t1' t2)
-    Nothing  -> Nothing
+    Nothing  -> 
+      case step t2 of
+        Just t2' -> Just (App t1 t2')
+        Nothing  -> Nothing
 step t = Nothing
 
 
