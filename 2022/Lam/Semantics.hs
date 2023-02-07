@@ -22,6 +22,10 @@ step (App t1 t2) =
       case step t2 of
         Just t2' -> Just (App t1 t2')
         Nothing  -> Nothing
+step (Abs x t) =
+  case step t of
+    Just t' -> Just (Abs x t')
+    Nothing -> Nothing
 step t = Nothing
 
 
