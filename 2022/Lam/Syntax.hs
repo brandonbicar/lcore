@@ -9,4 +9,6 @@ data Expr =
           Var Identifier
         | App Expr Expr
         | Abs Identifier Expr
+        | Pair Expr Expr
+        | LetPair (Identifier, Identifier) Expr Expr
         deriving Show

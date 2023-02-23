@@ -27,6 +27,11 @@ import Lam.Syntax
     '='     { TokenEq _ }
     '('     { TokenLParen _ }
     ')'     { TokenRParen _ }
+    '<'     { TokenLPair _ }
+    '>'     { TokenRPair _ }
+    ','     { TokenComma _ }
+    let     { TokenLet _ }
+    in      { TokenIn _ }
     
     
 
@@ -53,6 +58,8 @@ Expr :: { Expr }
 
   | Juxt
     { $1 }
+  | let '<' VAR ',' VAR '>' '=' Expr in Expr
+    { LetPair (symString $3, symString $5) $8 $10 }
 
 Juxt :: { Expr }
   : Juxt Atom                 { App $1 $2 }
@@ -61,6 +68,7 @@ Juxt :: { Expr }
 Atom :: { Expr }
   : '(' Expr ')'              { $2 }
   | VAR                       { Var $ symString $1 }
+  | '<' Expr ',' Expr '>'     { Pair $2 $4 }
   
 {
 

@@ -40,6 +40,11 @@ tokens :-
   \=                            { \p s -> TokenEq p }
   \(                            { \p s -> TokenLParen p }
   \)                            { \p s -> TokenRParen p }
+  let                           { \p s -> TokenLet p }
+  in                            { \p s -> TokenIn p }
+  \<                            { \p s -> TokenLPair p }
+  \>                            { \p s -> TokenRPair p }
+  \,                            { \p s -> TokenComma p }
   
 {
 
@@ -51,6 +56,11 @@ data Token
   | TokenLParen   { posn :: AlexPosn }
   | TokenRParen   { posn :: AlexPosn }
   | TokenNL       { posn :: AlexPosn }
+  | TokenLet      { posn :: AlexPosn }
+  | TokenIn       { posn :: AlexPosn }
+  | TokenLPair    { posn :: AlexPosn }
+  | TokenRPair    { posn :: AlexPosn }
+  | TokenComma    { posn :: AlexPosn }
   deriving (Eq, Show, Generic)
 
 symString :: Token -> String
