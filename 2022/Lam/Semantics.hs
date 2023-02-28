@@ -69,8 +69,8 @@ freeVars :: Expr -> [Identifier]
 freeVars (Var x)     = [x]
 freeVars (App t1 t2) = freeVars t1 ++ freeVars t2
 freeVars (Abs x t)   = delete x (nub (freeVars t))
-freeVars (Pair _ _)  = undefined
-freeVars (LetPair _ _ _) = undefined
+freeVars (Pair t1 t2) = freeVars t1 ++ freeVars t2
+freeVars (LetPair _ t t') = freeVars t ++ freeVars t'
 
 
 -- (\x -> \y -> x) (y a)
