@@ -34,14 +34,14 @@ tokens :-
   $eol+                         { \p s -> TokenNL p }
   $white+                       ;
   "--".*                        ;
+  let                           { \p s -> TokenLet p }
+  in                            { \p s -> TokenIn p }
   @sym				                  { \p s -> TokenSym p s }
   "->"                          { \p s -> TokenArrow p }
   \\                            { \p s -> TokenLambda p }
   \=                            { \p s -> TokenEq p }
   \(                            { \p s -> TokenLParen p }
   \)                            { \p s -> TokenRParen p }
-  let                           { \p s -> TokenLet p }
-  in                            { \p s -> TokenIn p }
   \<                            { \p s -> TokenLPair p }
   \>                            { \p s -> TokenRPair p }
   \,                            { \p s -> TokenComma p }
