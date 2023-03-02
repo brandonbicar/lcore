@@ -65,8 +65,18 @@ subst (Abs y t) t' x =
           in Abs freshVar (subst freshened t' x)
         else Abs y (subst t t' x)
 subst (Pair e1 e2) t' x = Pair (subst e1 t' x) (subst e2 t' x)
--- TODO: freshen vars
 subst (LetPair (x, y) t t') e i = LetPair (x, y) (subst t e i) (subst t' e i)
+-- TODO: freshen vars to avoid variable capture
+--  if x == i || y == i
+--    then LetPair (x, y) t t'
+--  else
+--    if x `elem` freeVars e
+--      then 
+--        let freshX = x ++ "'" 
+--            freshened = subst t (Var freshX) x
+--        in LetPair (x, y) (subst 
+--               if y `elem` freeVars e
+--                 then let freshY = y ++ "'"
                                     
 freeVars :: Expr -> [Identifier]
 freeVars (Var x)     = [x]
