@@ -54,42 +54,23 @@ subst :: Expr -> Expr -> Identifier -> Expr
 subst (Var y) t' x | y == x    = t'
                    | otherwise = Var y
 subst (App t1 t2) t' x         = App (subst t1 t' x) (subst t2 t' x)
-subst (Abs y t) t' x | x == y    = Abs y t
-                     | otherwise = if y `elem` freeVars t'
-                                     then
-                                       let freshVar = y ++ "'"
-                                           freshened = subst t (Var freshVar) y
-                                       in Abs freshVar (subst freshened t' x)
-                                     else Abs y (subst t t' x)
+subst (Abs y t) t' x =
+  if x == y
+    then Abs y t
+    else
+      if y `elem` freeVars t'
+        then
+          let freshVar = y ++ "'"
+              freshened = subst t (Var freshVar) y
+          in Abs freshVar (subst freshened t' x)
+        else Abs y (subst t t' x)
 subst (Pair e1 e2) t' x = Pair (subst e1 t' x) (subst e2 t' x)
 -- TODO: freshen vars
 subst (LetPair (x, y) t t') e i = LetPair (x, y) (subst t e i) (subst t' e i)
-
+                                    
 freeVars :: Expr -> [Identifier]
 freeVars (Var x)     = [x]
 freeVars (App t1 t2) = freeVars t1 ++ freeVars t2
 freeVars (Abs x t)   = delete x (nub (freeVars t))
 freeVars (Pair t1 t2) = freeVars t1 ++ freeVars t2
 freeVars (LetPair _ t t') = freeVars t ++ freeVars t'
-
-
--- (\x -> \y -> x) (y a)
--- \y' -> y a
---
--- multiStep App (Abs "x" (Abs "y" (Var "x"))) (App (Var "y") (Var "a"))
---
--- step App (Abs "x" (Abs "y" (Var "x"))) (App (Var "y") (Var "a"))
---
--- x = "x", t = (Abs "y" (Var "x")), t' = (App (Var "y") (Var "a"))
---
--- Just (subst (Abs "y" (Var "x")) (App (Var "y") (Var "a")) "x")
---
--- y = "y", t = (Var "x"), t' = (App (Var "y") (Var "a")), x = "x"
---
--- Abs "y" (subst (Var "x") (App (Var "y") (Var "a")) ("x"))
---
--- y = "x", t' = (App (Var "y") (Var "a")), x = "x"
---
--- (App (Var "y") (Var "a"))
---
--- Just (Abs "y'" (App (Var "y") (Var "a")))
