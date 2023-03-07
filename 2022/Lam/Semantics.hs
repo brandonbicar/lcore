@@ -15,11 +15,11 @@ multiStep t =
 step :: Expr -> Maybe Expr
 -- step (App (Var "read") t) =
 -- beta rule for function types
-step (App (Abs x t) t') = Just (subst t t' x)
+step (App (Abs x _ t) t') = Just (subst t t' x)
 -- congruence rule for abs.
-step (Abs x t) =
+step (Abs x mty t) =
   case step t of
-    Just t' -> Just (Abs x t')
+    Just t' -> Just (Abs x mty t')
     Nothing -> Nothing
 -- congruence rule for app.
 step (App t1 t2) =
@@ -54,16 +54,16 @@ subst :: Expr -> Expr -> Identifier -> Expr
 subst (Var y) t' x | y == x    = t'
                    | otherwise = Var y
 subst (App t1 t2) t' x         = App (subst t1 t' x) (subst t2 t' x)
-subst (Abs y t) t' x =
+subst (Abs y mty t) t' x =
   if x == y
-    then Abs y t
+    then Abs y mty t
     else
       if y `elem` freeVars t'
         then
           let freshVar = y ++ "'"
               freshened = subst t (Var freshVar) y
-          in Abs freshVar (subst freshened t' x)
-        else Abs y (subst t t' x)
+          in Abs freshVar mty (subst freshened t' x)
+        else Abs y mty (subst t t' x)
 subst (Pair e1 e2) t' x = Pair (subst e1 t' x) (subst e2 t' x)
 subst (LetPair (x, y) t t') e i = LetPair (x, y) (subst t e i) (subst t' e i)
 -- TODO: freshen vars to avoid variable capture
@@ -81,6 +81,6 @@ subst (LetPair (x, y) t t') e i = LetPair (x, y) (subst t e i) (subst t' e i)
 freeVars :: Expr -> [Identifier]
 freeVars (Var x)     = [x]
 freeVars (App t1 t2) = freeVars t1 ++ freeVars t2
-freeVars (Abs x t)   = delete x (nub (freeVars t))
+freeVars (Abs x _ t)   = delete x (nub (freeVars t))
 freeVars (Pair t1 t2) = freeVars t1 ++ freeVars t2
 freeVars (LetPair _ t t') = freeVars t ++ freeVars t'

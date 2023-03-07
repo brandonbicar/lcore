@@ -20,8 +20,8 @@ $lower  = [a-z]
 $upper  = [A-Z]
 $eol    = [\n]
 $alphanum  = [$alpha $digit \_]
-@sym    = $lower ($alphanum | \')*
 @constr = ($upper ($alphanum | \')* | \(\))
+@sym    = $lower ($alphanum | \')*
 @int    = \-? $digit+
 @charLiteral = \' ([\\.]|[^\']| . ) \'
 @stringLiteral = \"(\\.|[^\"]|\n)*\"
@@ -36,8 +36,10 @@ tokens :-
   "--".*                        ;
   let                           { \p s -> TokenLet p }
   in                            { \p s -> TokenIn p }
-  @sym				                  { \p s -> TokenSym p s }
+  @constr			{ \p s -> TokenSym p s }
+  @sym				{ \p s -> TokenSym p s }
   "->"                          { \p s -> TokenArrow p }
+  ":"                           { \p s -> TokenColon p }
   \\                            { \p s -> TokenLambda p }
   \=                            { \p s -> TokenEq p }
   \(                            { \p s -> TokenLParen p }
@@ -51,6 +53,7 @@ tokens :-
 data Token
   = TokenLambda   { posn :: AlexPosn }
   | TokenSym      { posn :: AlexPosn, sym :: String }
+  | TokenConstr   { posn :: AlexPosn, sym :: String }
   | TokenEq       { posn :: AlexPosn }
   | TokenArrow    { posn :: AlexPosn }
   | TokenLParen   { posn :: AlexPosn }
@@ -61,6 +64,7 @@ data Token
   | TokenLPair    { posn :: AlexPosn }
   | TokenRPair    { posn :: AlexPosn }
   | TokenComma    { posn :: AlexPosn }
+  | TokenColon    { posn :: AlexPosn }
   deriving (Eq, Show, Generic)
 
 symString :: Token -> String
