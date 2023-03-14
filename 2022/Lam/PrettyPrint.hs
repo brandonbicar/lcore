@@ -21,7 +21,8 @@ instance PrettyPrint Expr where
     isLexicallyAtomic (Var _)     = True
     isLexicallyAtomic _           = False
 
-    pprint (Abs var _ e)  = "\\" ++ var ++ " -> " ++ pprint e ++ ""
+    pprint (Abs var Nothing e)  = "\\" ++ var ++ " -> " ++ pprint e ++ ""
+    pprint (Abs var (Just ty) e)  = "\\(" ++ var ++ ":" ++ pprint ty ++ ") -> " ++ pprint e ++ ""
     pprint (App e1 e2)  = bracket_pprint e1 ++ " " ++ bracket_pprint e2
     pprint (Var var)    = var
     pprint (Pair e1 e2) = "<" ++ pprint e1 ++ ", " ++ pprint e2 ++ ">"
