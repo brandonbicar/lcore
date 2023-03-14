@@ -68,7 +68,7 @@ Expr :: { Expr }
 
 Type :: { Type }
   : Type '->' Type            { FunTy $1 $3 }
-  | CONSTR                    { Cons (sym $1) }
+  | CONSTR                    { Cons (constr $1) }
 
 Juxt :: { Expr }
   : Juxt Atom                 { App $1 $2 }

@@ -34,9 +34,9 @@ tokens :-
   $eol+                         { \p s -> TokenNL p }
   $white+                       ;
   "--".*                        ;
+  @constr			{ \p s -> TokenConstr p s }
   let                           { \p s -> TokenLet p }
   in                            { \p s -> TokenIn p }
-  @constr			{ \p s -> TokenSym p s }
   @sym				{ \p s -> TokenSym p s }
   "->"                          { \p s -> TokenArrow p }
   ":"                           { \p s -> TokenColon p }
@@ -52,8 +52,8 @@ tokens :-
 
 data Token
   = TokenLambda   { posn :: AlexPosn }
+  | TokenConstr   { posn :: AlexPosn, constr :: String }
   | TokenSym      { posn :: AlexPosn, sym :: String }
-  | TokenConstr   { posn :: AlexPosn, sym :: String }
   | TokenEq       { posn :: AlexPosn }
   | TokenArrow    { posn :: AlexPosn }
   | TokenLParen   { posn :: AlexPosn }
