@@ -21,5 +21,3 @@ data Type = FunTy Type Type
 
 type Context = [(Identifier, Type)]
 
-check :: Context -> Expr -> Type -> Bool
-check = error "TODO"

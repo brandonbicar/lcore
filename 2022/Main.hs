@@ -3,7 +3,7 @@ module Lam where
 import Lam.Parser      (parseProgram)
 import Lam.PrettyPrint (pprint)
 import Lam.Semantics   (multiStep)
-import Lam.Syntax
+import Lam.Types
 
 import System.Directory   (doesPathExist)
 import System.Environment (getArgs)
