@@ -28,7 +28,13 @@ abs ------------------------
 -}
 
 check :: Context -> Expr -> Type -> Bool
-check = error "TODO"
+check gamma (Abs x _ t) (FunTy tyA tyB) =
+  check ((x, tyA):gamma) t tyB
+check gamma e t =
+  case synth gamma e of
+    Just t' -> t == t'
+    Nothing -> False
+
 
 synth :: Context -> Expr -> Maybe Type
 synth gamma (Var x) = lookup x gamma
@@ -41,12 +47,9 @@ synth gamma (Abs x (Just tyA) t) =
 synth gamma (App t1 t2) =
   case synth gamma t1 of
     Just (FunTy tyA tyB) ->
-      case synth gamma t2 of
-        Just tyA' ->
-          if tyA == tyA'
-            then Just tyB
-            else error $ pprint tyA ++ " does not match " ++ pprint tyA'
-        Nothing -> Nothing
+      if check gamma t2 tyA
+        then Just tyB
+        else error $ "Expected type " ++ pprint tyA
     Just _  -> error $ "Left hand side of application " ++ pprint t1 ++ " is not a function"
     Nothing -> Nothing
 
