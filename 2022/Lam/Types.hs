@@ -27,31 +27,37 @@ abs ------------------------
 
 -}
 
-check :: Context -> Expr -> Type -> Bool
+type TypeError = String
+
+check :: Context -> Expr -> Type -> Either TypeError Bool
 check gamma (Abs x _ t) (FunTy tyA tyB) =
   check ((x, tyA):gamma) t tyB
 check gamma e t =
   case synth gamma e of
-    Just t' -> t == t'
-    Nothing -> False
+    Right t'   -> Right $ t == t'
+    Left error -> Left error
 
 
-synth :: Context -> Expr -> Maybe Type
-synth gamma (Var x) = lookup x gamma
+synth :: Context -> Expr -> Either TypeError Type
+synth gamma (Var x) =
+  case lookup x gamma of
+    Just ty -> Right ty
+    Nothing -> Left $ "I don't know the type of free variable " ++ x
 
 synth gamma (Abs x (Just tyA) t) =
   case synth ((x, tyA):gamma) t of
-    Just tyB -> Just (FunTy tyA tyB)
-    Nothing  -> Nothing
+    Right tyB -> Right (FunTy tyA tyB)
+    Left  err -> Left err
 
 synth gamma (App t1 t2) =
   case synth gamma t1 of
-    Just (FunTy tyA tyB) ->
-      if check gamma t2 tyA
-        then Just tyB
-        else error $ "Expected type " ++ pprint tyA
-    Just _  -> error $ "Left hand side of application " ++ pprint t1 ++ " is not a function"
-    Nothing -> Nothing
+    Right (FunTy tyA tyB) ->
+      case check gamma t2 tyA of
+        Right True  -> Right tyB
+        Right False -> Left $ "Expected type " ++ pprint tyA
+        Left err    -> Left err
+    Right _  -> Left $ "Left hand side of application " ++ pprint t1 ++ " is not a function"
+    Left err -> Left err
 
-synth _ t = error $ "Cannot infer type of " ++ pprint t
+synth _ t = Left $ "Cannot infer type of " ++ pprint t ++ ". Add more type signatures."
 

@@ -39,9 +39,9 @@ main = do
 
               -- Typing
               (case synth [] ast of
-                 Nothing -> putStrLn $ "\n " <> ansi_bold <> ansi_red
-                                             <> "Not well-typed.\n" <> ansi_reset
-                 Just ty -> putStrLn $ "\n " <> ansi_bold <> ansi_green
+                 Left err -> putStrLn $ "\n " <> ansi_bold <> ansi_red
+                                             <> "Not well-typed: " <> err <> "\n" <> ansi_reset
+                 Right ty -> putStrLn $ "\n " <> ansi_bold <> ansi_green
                                              <> "Well-typed " <> ansi_reset
                                              <> ansi_bold <> "as " <> ansi_reset <> pprint ty)
 
