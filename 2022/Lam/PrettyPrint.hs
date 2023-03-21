@@ -32,5 +32,5 @@ instance PrettyPrint Type where
     isLexicallyAtomic (Cons n)    = True
     isLexicallyAtomic _           = False
 
-    pprint (FunTy t1 t2) = pprint t1 ++ " -> " ++ bracket_pprint t2
+    pprint (FunTy t1 t2) = bracket_pprint t1 ++ " -> " ++ bracket_pprint t2
     pprint (Cons n)      = n
