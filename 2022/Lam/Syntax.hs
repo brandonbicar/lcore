@@ -17,6 +17,7 @@ type Name = String
 
 data Type = FunTy Type Type
           | Cons Name
+          | PairTy Type Type
   deriving (Show, Eq)
 
 type Context = [(Identifier, Type)]

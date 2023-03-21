@@ -23,7 +23,7 @@ app ---------------------------------------
 
       G, x : A |- e : B
 abs ------------------------
-      G |- \x -> e : A -> B
+      G |- \(x : A) -> e : A -> B
 
 -}
 
@@ -58,6 +58,17 @@ synth gamma (App t1 t2) =
         Left err    -> Left err
     Right _  -> Left $ "Left hand side of application " ++ pprint t1 ++ " is not a function"
     Left err -> Left err
+
+{-
+      G |- t1 : A
+      G |- t2 : B
+pair -------------------------
+      G |- (t1,t2) : A * B
+-}
+
+synth gamma (Pair t1 t2) =
+  case synth gamma t1 of
+    Right ()
 
 synth _ t = Left $ "Cannot infer type of " ++ pprint t ++ ". Add more type signatures."
 

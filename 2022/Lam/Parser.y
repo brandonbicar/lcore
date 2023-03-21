@@ -34,8 +34,8 @@ import Lam.Syntax
     ','     { TokenComma _ }
     let     { TokenLet _ }
     in      { TokenIn _ }
-    
-    
+
+
 
 %right '->'
 %%
@@ -69,6 +69,7 @@ Expr :: { Expr }
 Type :: { Type }
   : Type '->' Type            { FunTy $1 $3 }
   | CONSTR                    { Cons (constr $1) }
+  | '(' Type ')'              { $2 }
 
 Juxt :: { Expr }
   : Juxt Atom                 { App $1 $2 }
@@ -78,7 +79,7 @@ Atom :: { Expr }
   : '(' Expr ')'              { $2 }
   | VAR                       { Var $ symString $1 }
   | '<' Expr ',' Expr '>'     { Pair $2 $4 }
-  
+
 {
 
 parseError :: [Token] -> ReaderT String (Either String) a
