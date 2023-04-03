@@ -68,7 +68,29 @@ pair -------------------------
 
 synth gamma (Pair t1 t2) =
   case synth gamma t1 of
-    Right ()
+    Right tyA ->
+      case synth gamma t2 of
+        Right tyB -> Right (PairTy tyA tyB)
+        Left err -> Left err
+    Left err -> Left err
+
+{-
+        G |- t1 : A * B
+        G |- x : A, y : B |- t2 : C
+letpair -------------------------
+        G |- let <x,y> = t1 in t2 : C
+-}
+
+
+synth gamma ((LetPair (x,y) (t1) (t2))) =
+  case synth gamma t1 of
+    Right (PairTy tyA tyB) ->
+      case synth ((x, tyA):(y, tyB):gamma) t2 of
+        Right tyC -> Right tyC
+        Left err -> Left err
+    Right _ -> Left $ "Left hand side of application " ++ pprint t1 ++ " is not a pair"
+    Left err -> Left err
+  
 
 synth _ t = Left $ "Cannot infer type of " ++ pprint t ++ ". Add more type signatures."
 

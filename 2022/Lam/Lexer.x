@@ -47,6 +47,7 @@ tokens :-
   \<                            { \p s -> TokenLPair p }
   \>                            { \p s -> TokenRPair p }
   \,                            { \p s -> TokenComma p }
+  \*                            { \p s -> TokenStar p }
   
 {
 
@@ -65,6 +66,7 @@ data Token
   | TokenRPair    { posn :: AlexPosn }
   | TokenComma    { posn :: AlexPosn }
   | TokenColon    { posn :: AlexPosn }
+  | TokenStar     { posn :: AlexPosn }
   deriving (Eq, Show, Generic)
 
 symString :: Token -> String

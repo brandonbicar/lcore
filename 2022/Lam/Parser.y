@@ -34,6 +34,7 @@ import Lam.Syntax
     ','     { TokenComma _ }
     let     { TokenLet _ }
     in      { TokenIn _ }
+    '*'     { TokenStar _ }
 
 
 
@@ -68,6 +69,7 @@ Expr :: { Expr }
 
 Type :: { Type }
   : Type '->' Type            { FunTy $1 $3 }
+  | Type '*' Type             { PairTy $1 $3 }
   | CONSTR                    { Cons (constr $1) }
   | '(' Type ')'              { $2 }
 

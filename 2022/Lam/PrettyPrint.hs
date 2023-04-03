@@ -26,11 +26,12 @@ instance PrettyPrint Expr where
     pprint (App e1 e2)  = bracket_pprint e1 ++ " " ++ bracket_pprint e2
     pprint (Var var)    = var
     pprint (Pair e1 e2) = "<" ++ pprint e1 ++ ", " ++ pprint e2 ++ ">"
-    pprint (LetPair (x, y) t t') =  "let <" ++ x ++ ", " ++ y ++ "> = " ++ pprint t ++ "in " ++ pprint t'
+    pprint (LetPair (x, y) t t') =  "let <" ++ x ++ ", " ++ y ++ "> = " ++ pprint t ++ " in " ++ pprint t'
 
 instance PrettyPrint Type where
     isLexicallyAtomic (Cons n)    = True
     isLexicallyAtomic _           = False
 
     pprint (FunTy t1 t2) = bracket_pprint t1 ++ " -> " ++ bracket_pprint t2
+    pprint (PairTy t1 t2) = bracket_pprint t1 ++ " * " ++ bracket_pprint t2
     pprint (Cons n)      = n
