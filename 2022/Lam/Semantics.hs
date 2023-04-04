@@ -4,52 +4,63 @@ import           Data.List  (delete, nub)
 import           Lam.Syntax
 
 -- reduce to normal form with number of reductions
-multiStep :: Expr -> (Expr, Int)
-multiStep t =
-  case step t of
-    Nothing -> (t, 0)
-    Just t' -> let (t'', n) = multiStep t' in (t'', n + 1)
+multiStep :: Expr -> ([(Integer, Expr)]) -> (([(Integer, Expr)]), Expr, Int)
+multiStep t mem =
+  case step t mem of
+    Nothing -> (mem, t, 0)
+    Just (t', mem) -> let (mem, t'', n) = multiStep t' mem in (mem, t'', n + 1)
 
 -- single step reduction
--- step :: Expr
-step :: Expr -> Maybe Expr
--- step (App (Var "read") t) =
+step :: Expr -> [(Integer, Expr)] -> Maybe (Expr,[(Integer, Expr)])
+-- step (App (Var "alloc") t) =
 -- beta rule for function types
-step (App (Abs x _ t) t') = Just (subst t t' x)
+step (App (Abs x _ t) t') mem = Just ((subst t t' x), mem)
 -- congruence rule for abs.
-step (Abs x mty t) =
-  case step t of
-    Just t' -> Just (Abs x mty t')
+step (Abs x mty t) mem =
+  case step t mem of
+    Just (t', mem) -> Just ((Abs x mty t'), mem)
     Nothing -> Nothing
 -- congruence rule for app.
-step (App t1 t2) =
-  case step t1 of
-    Just t1' -> Just (App t1' t2)
+step (App t1 t2) mem =
+  case step t1 mem of
+    Just (t1', mem) -> Just ((App t1' t2), mem)
     Nothing  ->
-      case step t2 of
-        Just t2' -> Just (App t1 t2')
+      case step t2 mem of
+        Just (t2', mem) -> Just ((App t1 t2'), mem)
         Nothing  -> Nothing
 -- congruence rule for pairs
-step (Pair t1 t2) =
-  case step t1 of
-    Just t1' -> Just (Pair t1' t2)
+step (Pair t1 t2) mem =
+  case step t1 mem of
+    Just (t1', mem) -> Just ((Pair t1' t2), mem)
     Nothing  ->
-      case step t2 of
-        Just t2' -> Just (Pair t1 t2')
+      case step t2 mem of
+        Just (t2', mem) -> Just ((Pair t1 t2'), mem)
         Nothing -> Nothing
 -- beta rule for pair types
-step (LetPair (x, y) (Pair e1 e2) t) = Just (subst (subst t e1 x) e2 y)
+step (LetPair (x, y) (Pair e1 e2) t) mem = Just ((subst (subst t e1 x) e2 y), mem)
 -- congruence rule for let pair
-step (LetPair p e t) =
-  case step e of
-    Just e' -> Just (LetPair p e' t)
+step (LetPair p e t) mem =
+  case step e mem of
+    Just (e', mem) -> Just ((LetPair p e' t), mem)
     Nothing ->
-      case step t of 
-        Just t' -> Just (LetPair p e t')
+      case step t mem of 
+        Just (t', mem) -> Just ((LetPair p e t'), mem)
         Nothing -> Nothing
-step t = Nothing
+-- beta rule for LetUnit
+step (LetUnit Unit t) mem = Just (t, mem)
+-- congruence rule for LetUnit
+step (LetUnit t1 t2) mem  =
+  case step t1 mem of
+    Just (t1', mem) -> Just ((LetUnit t1' t2), mem)
+    Nothing ->
+      case step t2 mem of
+        Just (t2', mem) -> Just ((LetUnit t1 t2'), mem)
+        Nothing -> Nothing
+step t _ = Nothing
 
 
+-- subst e1 e2 x
+-- replace all occurences of x in e1 with e2
 subst :: Expr -> Expr -> Identifier -> Expr
 subst (Var y) t' x | y == x    = t'
                    | otherwise = Var y
@@ -77,10 +88,16 @@ subst (LetPair (x, y) t t') e i = LetPair (x, y) (subst t e i) (subst t' e i)
 --        in LetPair (x, y) (subst 
 --               if y `elem` freeVars e
 --                 then let freshY = y ++ "'"
+subst Unit _ _    = Unit
+subst (LetUnit t1 t2) t' x = LetUnit (subst t1 t' x) (subst t2 t' x)
+subst (Ref _) _ _ = error "temp"
                                     
 freeVars :: Expr -> [Identifier]
-freeVars (Var x)     = [x]
-freeVars (App t1 t2) = freeVars t1 ++ freeVars t2
-freeVars (Abs x _ t)   = delete x (nub (freeVars t))
-freeVars (Pair t1 t2) = freeVars t1 ++ freeVars t2
+freeVars (Var x)          = [x]
+freeVars (App t1 t2)      = freeVars t1 ++ freeVars t2
+freeVars (Abs x _ t)      = delete x (nub (freeVars t))
+freeVars (Pair t1 t2)     = freeVars t1 ++ freeVars t2
 freeVars (LetPair _ t t') = freeVars t ++ freeVars t'
+freeVars Unit             = []
+freeVars (LetUnit t1 t2)  = freeVars t1 ++ freeVars t2
+freeVars (Ref _)          = error "temp"

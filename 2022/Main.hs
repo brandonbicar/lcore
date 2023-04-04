@@ -33,7 +33,7 @@ main = do
               putStrLn $ "\n " <> ansi_bold <> "Pretty: " <> ansi_reset <> pprint ast
 
               -- Evaluate
-              let (normalForm, count) = multiStep ast
+              let (_, normalForm, count) = multiStep ast []
               putStrLn $ "\n " <> ansi_bold <> "Number of steps: " <> ansi_reset <> show count
               putStrLn $ "\n " <> ansi_bold <> "Normal form: " <> ansi_reset <> pprint normalForm
 
