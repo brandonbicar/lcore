@@ -90,7 +90,7 @@ subst (LetPair (x, y) t t') e i = LetPair (x, y) (subst t e i) (subst t' e i)
 --                 then let freshY = y ++ "'"
 subst Unit _ _    = Unit
 subst (LetUnit t1 t2) t' x = LetUnit (subst t1 t' x) (subst t2 t' x)
-subst (Ref t) t' x = Ref (subst t t' x)
+subst (Ref n) _ _ = Ref n
                                     
 freeVars :: Expr -> [Identifier]
 freeVars (Var x)          = [x]
@@ -100,4 +100,4 @@ freeVars (Pair t1 t2)     = freeVars t1 ++ freeVars t2
 freeVars (LetPair _ t t') = freeVars t ++ freeVars t'
 freeVars Unit             = []
 freeVars (LetUnit t1 t2)  = freeVars t1 ++ freeVars t2
-freeVars (Ref t)          = freeVars t
+freeVars (Ref _)          = []
