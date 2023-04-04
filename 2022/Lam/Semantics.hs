@@ -59,8 +59,8 @@ step (LetUnit t1 t2) mem  =
 step t _ = Nothing
 
 
--- subst e1 e2 x
--- replace all occurences of x in e1 with e2
+-- subst t t' x
+-- replace all occurences of x in t with t'
 subst :: Expr -> Expr -> Identifier -> Expr
 subst (Var y) t' x | y == x    = t'
                    | otherwise = Var y
@@ -90,7 +90,7 @@ subst (LetPair (x, y) t t') e i = LetPair (x, y) (subst t e i) (subst t' e i)
 --                 then let freshY = y ++ "'"
 subst Unit _ _    = Unit
 subst (LetUnit t1 t2) t' x = LetUnit (subst t1 t' x) (subst t2 t' x)
-subst (Ref _) _ _ = error "temp"
+subst (Ref t) t' x = Ref (subst t t' x)
                                     
 freeVars :: Expr -> [Identifier]
 freeVars (Var x)          = [x]
@@ -100,4 +100,4 @@ freeVars (Pair t1 t2)     = freeVars t1 ++ freeVars t2
 freeVars (LetPair _ t t') = freeVars t ++ freeVars t'
 freeVars Unit             = []
 freeVars (LetUnit t1 t2)  = freeVars t1 ++ freeVars t2
-freeVars (Ref _)          = error "temp"
+freeVars (Ref t)          = freeVars t
