@@ -12,7 +12,8 @@ multiStep t mem =
 
 -- single step reduction
 step :: Expr -> [(Integer, Expr)] -> Maybe (Expr,[(Integer, Expr)])
--- step (App (Var "alloc") t) =
+step (App (Var "alloc") t) mem =
+  let n = maxPointer mem in Just (Ref (n + 1), ((n + 1, t) : mem))
 -- beta rule for function types
 step (App (Abs x _ t) t') mem = Just ((subst t t' x), mem)
 -- congruence rule for abs.
@@ -58,6 +59,8 @@ step (LetUnit t1 t2) mem  =
         Nothing -> Nothing
 step t _ = Nothing
 
+maxPointer :: [(Integer, Expr)] -> Integer
+maxPointer mem = let (pointers, _) = unzip mem in maximum pointers
 
 -- subst t t' x
 -- replace all occurences of x in t with t'
