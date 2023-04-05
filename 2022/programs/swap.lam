@@ -1,0 +1,1 @@
+(swap (\y -> y) (alloc (\x -> x))) z
