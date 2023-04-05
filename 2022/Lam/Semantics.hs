@@ -7,8 +7,8 @@ import           Lam.Syntax
 multiStep :: Expr -> ([(Integer, Expr)]) -> (([(Integer, Expr)]), Expr, Int)
 multiStep t mem =
   case step t mem of
-    Nothing -> (mem, t, 0)
-    Just (t', mem) -> let (mem, t'', n) = multiStep t' mem in (mem, t'', n + 1)
+    Just (t', mem) -> let (mem', t'', n) = multiStep t' mem in (mem', t'', n + 1)
+    Nothing        -> (mem, t, 0)
 
 updateDict :: Eq a => [(a,b)] -> a -> b -> [(a,b)]
 updateDict [] _ _ = []
@@ -73,7 +73,7 @@ step (LetUnit t1 t2) mem  =
 step t _ = Nothing
 
 maxPointer :: [(Integer, Expr)] -> Integer
-maxPointer []  = 0 
+maxPointer []  = 0
 maxPointer mem = let (pointers, _) = unzip mem in maximum pointers
 
 -- subst t t' x
