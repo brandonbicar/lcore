@@ -10,10 +10,23 @@ multiStep t mem =
     Nothing -> (mem, t, 0)
     Just (t', mem) -> let (mem, t'', n) = multiStep t' mem in (mem, t'', n + 1)
 
+updateDict :: Eq a => [(a,b)] -> a -> b -> [(a,b)]
+updateDict [] _ _ = []
+updateDict ((x,y):xs) a b
+  | a == x    = ((x,b) : xs) 
+  | otherwise = ((x,y) : updateDict xs a b)
+
 -- single step reduction
 step :: Expr -> [(Integer, Expr)] -> Maybe (Expr,[(Integer, Expr)])
 step (App (Var "alloc") t) mem =
   let n = maxPointer mem in Just (Ref (n + 1), ((n + 1, t) : mem))
+step (App (App (Var "swap") t) (Ref n)) mem =
+  case lookup n mem of
+    Just t' ->
+      case updateDict mem n t of
+        []   -> Nothing
+        mem' -> Just ((Pair (t') (Ref n)), mem')
+    Nothing -> Nothing
 -- beta rule for function types
 step (App (Abs x _ t) t') mem = Just ((subst t t' x), mem)
 -- congruence rule for abs.
@@ -60,6 +73,7 @@ step (LetUnit t1 t2) mem  =
 step t _ = Nothing
 
 maxPointer :: [(Integer, Expr)] -> Integer
+maxPointer []  = 0 
 maxPointer mem = let (pointers, _) = unzip mem in maximum pointers
 
 -- subst t t' x
