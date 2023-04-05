@@ -16,8 +16,12 @@ updateDict ((x,y):xs) a b
   | a == x    = ((x,b) : xs) 
   | otherwise = ((x,y) : updateDict xs a b)
 
+delFromAL :: Eq key => [(key, a)] -> key -> [(key, a)]
+delFromAL l key = filter (\a -> (fst a) /= key) l
+
 -- single step reduction
 step :: Expr -> [(Integer, Expr)] -> Maybe (Expr,[(Integer, Expr)])
+step (App (Var "free") (Ref n)) mem = Just (Unit, delFromAL mem n)
 step (App (Var "alloc") t) mem =
   let n = maxPointer mem in Just (Ref (n + 1), ((n + 1, t) : mem))
 step (App (App (Var "swap") t) (Ref n)) mem =
