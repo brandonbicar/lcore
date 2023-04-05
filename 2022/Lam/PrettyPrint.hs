@@ -29,7 +29,7 @@ instance PrettyPrint Expr where
     pprint (LetPair (x, y) t t') =  "let <" ++ x ++ ", " ++ y ++ "> = " ++ pprint t ++ " in " ++ pprint t'
     pprint Unit                  = "()"
     pprint (LetUnit e1 e2)       = "let () = " ++ pprint e1 ++ " in " ++ pprint e2 
-    pprint (Ref e)               = error "todo"
+    pprint (Ref n)               = "ref(" ++ show n ++ ")"
 
 instance PrettyPrint Type where
     isLexicallyAtomic (Cons n)    = True
@@ -39,4 +39,4 @@ instance PrettyPrint Type where
     pprint (PairTy t1 t2) = bracket_pprint t1 ++ " * " ++ bracket_pprint t2
     pprint (Cons n)       = n
     pprint UnitTy         = "()"
-    pprint (RefTy t)      = error "todo"
+    pprint (RefTy t)      = "ref" ++ pprint t
