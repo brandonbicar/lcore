@@ -39,6 +39,28 @@ check gamma e t =
 
 
 synth :: Context -> Expr -> Either TypeError Type
+synth gamma (Unit) = Right UnitTy
+
+synth gamma (App (Var "alloc") t) =
+  case synth gamma t of
+    Right ty  -> Right (RefTy ty)
+    Left err  -> Left err
+
+synth gamma (App (App (Var "swap") t1) t2) =
+  case synth gamma t1 of
+    Right ty ->
+      case check gamma t2 (RefTy ty) of
+        Right True  -> Right (PairTy ty (RefTy ty))
+        Right False -> Left $ "Expected type " ++ pprint ty
+        Left err    -> Left err
+    Left err -> Left err
+
+synth gamma (App (Var "free") t) =
+  case synth gamma t of
+    Right (RefTy ty) -> Right UnitTy
+    Right ty         -> Left $ pprint ty ++ " is not a reference"
+    Left err         -> Left err
+
 synth gamma (Var x) =
   case lookup x gamma of
     Just ty -> Right ty
