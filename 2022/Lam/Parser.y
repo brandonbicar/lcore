@@ -74,6 +74,7 @@ Type :: { Type }
   : Type '->' Type            { FunTy $1 $3 }
   | Type '*' Type             { PairTy $1 $3 }
   | CONSTR                    { Cons (constr $1) }
+  | CONSTR Type               { if constr $1 == "Ref" then RefTy $2 else error "I don't know what to do here" }
   | '(' Type ')'              { $2 }
   | '(' ')'                   { UnitTy }
 
