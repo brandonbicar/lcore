@@ -54,6 +54,7 @@ NL :: { () }
 
 Def :: { Expr -> Expr }
   : VAR '=' Expr { \program -> App (Abs (symString $1) Nothing program) $3 }
+  | VAR ':' Type '=' Expr { \program -> App (Abs (symString $1) (Just $3) program) $5 }
 
 Expr :: { Expr }
   : '\\' VAR '->' Expr
@@ -64,8 +65,8 @@ Expr :: { Expr }
 
   | Juxt
     { $1 }
---  | let '<' VAR ',' VAR '>' '=' Expr in Expr
---    { LetPair (symString $3, symString $5) $8 $10 }
+ | let '<' VAR ',' VAR '>' '=' Expr in Expr
+   { LetPair (symString $3, symString $5) $8 $10 }
   | let '(' ')' '=' Expr in Expr
     { LetUnit $5 $7 }
 
