@@ -1,0 +1,2 @@
+r : Ref (() -> () -> ()) = alloc (\(x : ()) -> \(y : ()) -> let () = y in x)
+let <f, r'> = swap (\(a : ()) -> \(b : ()) -> let () = a in b) r in f () (free r')
