@@ -1,2 +1,2 @@
-fst = \(z : (A -> A) * (B -> B)) -> let <x, y> = z in x
+fst : ((A -> A) * (B -> B)) -> (A -> A) = \z -> let <x, y> = z in x
 fst <\(x : A) -> x, (\(y : B) -> y)>

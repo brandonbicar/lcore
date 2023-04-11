@@ -112,7 +112,7 @@ synth gamma ((LetPair (x,y) (t1) (t2))) =
         Left err -> Left err
     Right _ -> Left $ "Left hand side of application " ++ pprint t1 ++ " is not a pair"
     Left err -> Left err
-  
+
 
 synth _ t = Left $ "Cannot infer type of " ++ pprint t ++ ". Add more type signatures."
 
