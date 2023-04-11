@@ -51,7 +51,7 @@ synth gamma (App (App (Var "swap") t1) t2) =
     Right ty ->
       case check gamma t2 (RefTy ty) of
         Right True  -> Right (PairTy ty (RefTy ty))
-        Right False -> Left $ "Expected type " ++ pprint ty
+        Right False -> Left $ "In use of swap, expected type " ++ pprint (RefTy ty)
         Left err    -> Left err
     Left err -> Left err
 
