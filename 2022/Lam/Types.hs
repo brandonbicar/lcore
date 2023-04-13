@@ -41,6 +41,15 @@ check gamma e t =
 synth :: Context -> Expr -> Either TypeError Type
 synth gamma (Unit) = Right UnitTy
 
+synth gamma (LetUnit t1 t2) =
+  case check gamma t1 UnitTy of
+    Right True  ->
+      case synth gamma t2 of
+        Right ty -> Right ty
+        Left err -> Left err
+    Right False -> Left $ pprint t1 ++ " is not a unit."
+    Left err    -> Left err
+
 synth gamma (App (Var "alloc") t) =
   case synth gamma t of
     Right ty  -> Right (RefTy ty)

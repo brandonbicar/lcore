@@ -58,6 +58,18 @@ check gamma e t =
 synth :: Context -> Expr -> Either TypeError (Type, Context)
 synth gamma (Unit) = Right (UnitTy, [])
 
+synth gamma (LetUnit t1 t2) =
+  case check gamma t1 UnitTy of
+    Right (True, delta1) ->
+      case synth gamma t2 of
+        Right (ty, delta2) ->
+          case commonVars delta1 delta2 of
+            [] -> Right (ty, (delta1 ++ delta2))
+            vars -> Left $ "linear type error: some variable is used more than once - " ++ pprintVars vars
+        Left err           -> Left err
+    Right (False, _)    -> Left $ pprint t1 ++ " is not a unit."
+    Left err            -> Left err
+
 synth gamma (App (Var "alloc") t) =
   case synth gamma t of
     Right (ty, delta) -> Right (RefTy ty, delta)
