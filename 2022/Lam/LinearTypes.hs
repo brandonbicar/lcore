@@ -88,7 +88,10 @@ synth gamma (Var x) =
 
 synth gamma (Abs x (Just tyA) t) =
   case synth ((x, tyA):gamma) t of
-    Right (tyB, delta) -> Right ((FunTy tyA tyB), delta)
+    Right (tyB, delta) ->
+     case (elem x (map fst delta)) of
+       True  -> Right ((FunTy tyA tyB), (delFromAL delta x))
+       False -> Left $ "Linear type error: variable " ++ x ++ " was not used."
     Left  err          -> Left err
 
 synth gamma (App t1 t2) =
