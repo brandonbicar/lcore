@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -fmax-pmcheck-models=100 #-}
 module Lam.Types where
 
 import           Lam.Syntax
