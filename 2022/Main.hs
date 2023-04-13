@@ -4,6 +4,7 @@ import Lam.Parser      (parseProgram)
 import Lam.PrettyPrint (pprint)
 import Lam.Semantics   (multiStep)
 import Lam.Types
+import qualified Lam.LinearTypes as LinearTypes
 
 import System.Directory   (doesPathExist)
 import System.Environment (getArgs)
@@ -39,6 +40,13 @@ main = do
 
               -- Typing
               (case synth [] ast of
+                 Left err -> putStrLn $ "\n " <> ansi_bold <> ansi_red
+                                             <> "Not well-typed: " <> err <> "\n" <> ansi_reset
+                 Right ty -> putStrLn $ "\n " <> ansi_bold <> ansi_green
+                                             <> "Well-typed " <> ansi_reset
+                                             <> ansi_bold <> "as " <> ansi_reset <> pprint ty)
+
+              (case LinearTypes.synth [] ast of
                  Left err -> putStrLn $ "\n " <> ansi_bold <> ansi_red
                                              <> "Not well-typed: " <> err <> "\n" <> ansi_reset
                  Right ty -> putStrLn $ "\n " <> ansi_bold <> ansi_green

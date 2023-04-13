@@ -24,6 +24,7 @@ executable lcore
       Lam.Semantics
       Lam.PrettyPrint
       Lam.Types
+      Lam.LinearTypes
       Paths_lambda_core
   hs-source-dirs:
       ./.
