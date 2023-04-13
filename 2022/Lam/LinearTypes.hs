@@ -150,9 +150,15 @@ synth gamma ((LetPair (x,y) (t1) (t2))) =
     Right ((PairTy tyA tyB), delta1) ->
       case synth ((x, tyA):(y, tyB):gamma) t2 of
         Right (tyC, delta2) ->
-          case commonVars delta1 delta2 of
-            []   -> Right (tyC, (delta1 ++ delta2))
-            vars -> Left $ "linear type error: some variable is used more than once - " ++ pprintVars vars
+          case elem x (map fst delta2) of
+            True ->
+              case elem y (map fst delta2) of
+                True ->
+                  case commonVars delta1 delta2 of
+                    []   -> Right (tyC, delta1 ++ (delFromAL (delFromAL delta2 x) y))
+                    vars -> Left $ "linear type error: some variable is used more than once - " ++ pprintVars vars
+                False -> Left $ "linear type error: variable " ++ y ++ " was not used."
+            False -> Left $ "linear type error: variable " ++ x ++ " was not used."
         Left err            -> Left err
     Right _ -> Left $ "Left hand side of application " ++ pprint t1 ++ " is not a pair"
     Left err -> Left err
