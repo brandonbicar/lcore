@@ -1,4 +1,3 @@
-{-# OPTIONS_GHC -fmax-pmcheck-models=100 #-}
 module Lam.LinearTypes where
 
 import           Lam.Syntax
