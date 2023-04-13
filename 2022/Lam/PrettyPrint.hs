@@ -39,4 +39,4 @@ instance PrettyPrint Type where
     pprint (PairTy t1 t2) = bracket_pprint t1 ++ " * " ++ bracket_pprint t2
     pprint (Cons n)       = n
     pprint UnitTy         = "()"
-    pprint (RefTy t)      = "Ref " ++ pprint t
+    pprint (RefTy t)      = "Ref " ++ bracket_pprint t
