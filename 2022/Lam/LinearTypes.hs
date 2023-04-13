@@ -48,7 +48,7 @@ check gamma (Abs x _ t) (FunTy tyA tyB) =
     Right (b, delta) ->
       case (elem x (map fst delta)) of
         True  -> Right (b, (delFromAL delta x))
-        False -> Left $ "Linear type error: variable " ++ x ++ "was not used."
+        False -> Left $ "Linear type error: variable " ++ x ++ " was not used."
     Left err -> Left err
 check gamma e t =
   case synth gamma e of
