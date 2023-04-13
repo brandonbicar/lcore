@@ -49,7 +49,7 @@ main = do
               (case LinearTypes.synth [] ast of
                  Left err -> putStrLn $ "\n " <> ansi_bold <> ansi_red
                                              <> "Not well-typed: " <> err <> "\n" <> ansi_reset
-                 Right ty -> putStrLn $ "\n " <> ansi_bold <> ansi_green
+                 Right (ty, _) -> putStrLn $ "\n " <> ansi_bold <> ansi_green
                                              <> "Well-typed " <> ansi_reset
                                              <> ansi_bold <> "as " <> ansi_reset <> pprint ty)
 
